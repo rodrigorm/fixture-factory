@@ -88,6 +88,7 @@ class FixtureFactoryTestCase extends CakeTestCase {
     FFactory::define('User', $defaults);
     
     $user->expectOnce('create', array($defaults));
+    $user->setReturnValue('save', true);
     
     FFactory::create('User');
   }
@@ -102,6 +103,7 @@ class FixtureFactoryTestCase extends CakeTestCase {
     );
     
     $user->expectOnce('save');
+    $user->setReturnValue('save', true);
     
     FFactory::create('User');
   }
@@ -278,8 +280,28 @@ class FixtureFactoryTestCase extends CakeTestCase {
     );
     
     $user->expectOnce('save');
+    $user->setReturnValue('save', true);
     
     FFactory::create('InactiveUser');
+  }
+  
+  // =============
+  // = Exceptions =
+  // =============
+  
+  function testBuildThrowsExceptionIfFactoryIsNotDefined() {
+    $this->expectException('FactoryNotDefinedException');
+    FFactory::build('Undefined');
+  }
+  
+  function testCreateThrowsExceptionIfRecordSaveIsUnsuccessfull() {
+    $user =& $this->_mockModel('User');
+    $user->setReturnValue('save', false);
+    $this->expectException('RecordNotSavedException');
+    
+    FFactory::define('User');
+    
+    FFactory::create('User', array('login' => 'joe'));
   }
 }
 ?>

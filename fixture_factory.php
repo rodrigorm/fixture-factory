@@ -1,4 +1,7 @@
 <?php
+class FactoryNotDefinedException extends Exception { }
+class RecordNotSavedException extends Exception { }
+
 class FFactory {
   
   static $_instance = array();
@@ -64,12 +67,12 @@ class FFactory {
       }
       return $data;
     } else {
-      throw new FactoryDoesNotExistException("Factory for [$alias] does not exist.");
+      throw new FactoryNotDefinedException("Factory [$alias] is not defined.");
     }
     return null;
   }
   
-  static function create($alias, $attributes = array()) {
+  static function create($alias, $attributes = array(), $throwException = true) {
     $_this = self::getInstance();
     $data = self::build($alias, $attributes);
     if (!empty($data)) {
@@ -77,6 +80,8 @@ class FFactory {
       $model->create($data);
       if ($model->save()) {
         return $model->read();
+      } elseif ($throwException) {
+        throw new RecordNotSavedException("Could not save record with [$alias] factory.");
       }
     }
     return null;
