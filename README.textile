@@ -4,10 +4,16 @@ Fixture Factory is a tool that let's you easily create data for testing in CakeP
 
 h2. Installation
 
-Place fixture_factory.php file in vendors/fixture_factory folder and add following line before a test case you want to use FF in.
+If you are using git in you app do this: 
 
 <pre>
-  App::Import('Vendor', 'fixture_factory');
+	git submodule add git://github.com/rodrigorm/fixture-factory.git plugins/fixture_factory
+</pre>
+
+Ou just download this plugin and place files in app/plugins/fixture_factory and add following line before a test case you want to use FF in.
+
+<pre>
+  App::Import('Vendor', 'FixtureFactory.fixture_factory');
 </pre>
 
 h2. Defining factories
@@ -15,28 +21,28 @@ h2. Defining factories
 Before you start creating test data you must define factories for your models.
 
 <pre>
-  FFactory::define('User', array(
-    'active' => 1,
-    'gender' => 'm'
-  ));
+	FFactory::define('User', array(
+		'active' => 1,
+		'gender' => 'm'
+	));
 </pre>
 
 This will create factory for User model with some default values. Now you can create an user with that factory.
 
 <pre>
-  $user = FFactory::create('User', array(
-    'login' => 'joe',
-    'email' => 'joe@example.org'
-  ));
+	$user = FFactory::create('User', array(
+		'login' => 'joe',
+		'email' => 'joe@example.org'
+	));
 </pre>
 
 Model attributes passed to create method with be merged with defaults (or will overwrite them) passed during factory definition. Create method saves the record to the database, then reads it back (with $model->read()) and returns whole record. If you want just to build user data without saving it to database use build method instead.
 
 <pre>
-  $user = FFactory::create('User', array(
-    'login' => 'joe',
-    'email' => 'joe@example.org'
-  ));
+	$user = FFactory::build('User', array(
+		'login' => 'joe',
+		'email' => 'joe@example.org'
+	));
 </pre>
 
 h2. Sequences
@@ -44,11 +50,11 @@ h2. Sequences
 Sometimes there is a need to have unique values for some fields, for example emails or logins. You can generate unique values with sequences.
 
 <pre>
-  FFactory::sequence('logins', 'user {n}');
-  
-  FFactory::define('User', array(
-    'login' => array('sequence', 'logins');
-  ));
+	FFactory::sequence('logins', 'user {n}');
+
+	FFactory::define('User', array(
+		'login' => array('sequence', 'logins');
+	));
 </pre>
 
 Now logins will be set to 'user 1', 'user 2', 'user 3' and so on.
@@ -58,10 +64,10 @@ h2. Associations
 When you test your models you often expect that records for associated models are already present in database. For example when you test Article model you expect that article's author already exists. You don't need to create a record for author by hand, Fixture Factory is able to take care of it. All you have to do is to define factory for User before creating/building Article data.
 
 <pre>
-  FFactory::define('Article', array(
-    'title' => 'new title',
-    'user_id' => array('assoc', 'User', 'id')
-  ));
+	FFactory::define('Article', array(
+		'title' => 'new title',
+		'user_id' => array('assoc', 'User', 'id')
+	));
 </pre>
 
 Associated user will now be saved to database before article. It will also be saved even if you only build data for Article.
@@ -71,13 +77,13 @@ h2. Aliased factories
 You can have many factories for one model. It is useful if you want to test your data in different context and keep the code more readable. In such situations you just pass model name as an additional parameter.
 
 <pre>
-  FFactory::define('User', array(
-    'active' => 1
-  ));
+	FFactory::define('User', array(
+		'active' => 1
+	));
   
-  FFactory::define('InactiveUser', array(
-    'active' => 0
-  ), 'User');
+	FFactory::define('InactiveUser', array(
+		'active' => 0
+	), 'User');
 </pre>
 
 h2. Copyright
