@@ -122,7 +122,7 @@ class FixtureFactoryTestCase extends CakeTestCase {
 		$this->assertEqual($result, $expected);
 	}
 
-	function testCreateSavesRecordWithBuiltRecordData() {    
+	function testCreateSavesRecordWithBuiltRecordData() {
 		$defaults = array(
 			'active' => 1,
 			'gender' => 'm'
