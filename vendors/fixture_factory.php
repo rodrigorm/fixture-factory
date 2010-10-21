@@ -85,8 +85,7 @@ class FFactory {
 			$fieldList = array_keys($data);
 			$options = array(
 				'validate' => false,
-				'fieldList' => $fieldList,
-				'callbacks' => false
+				'fieldList' => $fieldList
 			);
 			if ($model->save($data, $options)) {
 				return $model->read();
