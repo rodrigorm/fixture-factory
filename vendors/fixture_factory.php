@@ -78,7 +78,8 @@ class FFactory {
 		if (!empty($data)) {
 			$model = $_this->load($_this->models[$alias]['model']);
 			$model->create($data);
-			if ($model->save()) {
+			$fieldList = array_keys($data);
+			if ($model->save($data, true, $fieldList)) {
 				return $model->read();
 			} elseif ($throwException) {
 				throw new RecordNotSavedException("Could not save record with [$alias] factory.");
