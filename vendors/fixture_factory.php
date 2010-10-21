@@ -23,12 +23,12 @@ class FFactory {
 		$_this->sequences = array();
 	}
 
-	static function define($alias, $attributes = array(), $model = null) {
+	static function define($alias, $attributes = array(), $model = null, $extends = null) {
 		$_this = self::getInstance();
 		if (empty($model)) {
 			$model = Inflector::classify($alias);
 		}
-		$_this->models[$alias] = array('attributes' => $attributes, 'model' => $model);
+		$_this->models[$alias] = array('attributes' => $attributes, 'model' => $model, 'extends' => $extends);
 	}
 
 	static function sequence($seq, $value, $start = 1) {
@@ -47,7 +47,11 @@ class FFactory {
 	static function build($alias, $attributes = array()) {
 		$_this = self::getInstance();
 		if (!empty($_this->models[$alias])) {
-			$data = array_merge($_this->models[$alias]['attributes'], $attributes);
+			$extends = array();
+			if (!empty($_this->models[$alias]['extends'])) {
+				$extends = FFactory::build($_this->models[$alias]['extends']);
+			}
+			$data = array_merge($extends, $_this->models[$alias]['attributes'], $attributes);
 			foreach ($data as &$value) {
 				if (is_array($value)) {
 					switch ($value[0]) {
@@ -77,9 +81,14 @@ class FFactory {
 		$data = self::build($alias, $attributes);
 		if (!empty($data)) {
 			$model = $_this->load($_this->models[$alias]['model']);
-			$model->create($data);
+			$model->create();
 			$fieldList = array_keys($data);
-			if ($model->save($data, true, $fieldList)) {
+			$options = array(
+				'validate' => false,
+				'fieldList' => $fieldList,
+				'callbacks' => false
+			);
+			if ($model->save($data, $options)) {
 				return $model->read();
 			} elseif ($throwException) {
 				throw new RecordNotSavedException("Could not save record with [$alias] factory.");
