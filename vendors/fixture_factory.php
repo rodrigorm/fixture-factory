@@ -1,5 +1,6 @@
 <?php
 class FactoryNotDefinedException extends Exception { }
+class SequenceNotDefinedException extends Exception { }
 class RecordNotSavedException extends Exception { }
 
 class FFactory {
@@ -40,6 +41,8 @@ class FFactory {
 		$_this = self::getInstance();
 		if (!empty($_this->sequences[$seq])) {
 			return str_replace('{n}', $_this->sequences[$seq]['n']++, $_this->sequences[$seq]['value']);
+		} else {
+			throw new SequenceNotDefinedException("Sequence [$seq] is not defined.");
 		}
 		return null;
 	}
